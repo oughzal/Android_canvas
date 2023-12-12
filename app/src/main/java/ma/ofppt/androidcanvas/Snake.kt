@@ -12,6 +12,7 @@ class Snake(context : Context, attrs : AttributeSet) : View(context,attrs) {
     val sn = ArrayList<Point>()
     var nbcol= 20
     var nbrow = 0
+    var gameOver = false
     var squareSize = 0f
     var head = Point(10,10)
     lateinit var bait : Point
@@ -30,7 +31,7 @@ class Snake(context : Context, attrs : AttributeSet) : View(context,attrs) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         var paint = Paint()
-        paint.color = Color.rgb(200,200,200)
+        paint.color = Color.rgb(240,240,240)
         paint.style = Paint.Style.STROKE
         paint.strokeWidth=2f
         for(i in 0 until  nbrow){
@@ -40,14 +41,31 @@ class Snake(context : Context, attrs : AttributeSet) : View(context,attrs) {
             }
         }
 
-        paint.style = Paint.Style.FILL
-        paint.color = Color.GREEN
-        canvas.drawRect(bait.getRect(squareSize),paint)
+            paint.style = Paint.Style.FILL
+            paint.color = Color.GREEN
+            canvas.drawRect(bait.getRect(squareSize), paint)
 
-        paint.color = Color.RED
-        for(p in sn){
-            canvas.drawRect(p.getRect(squareSize),paint)
+            paint.color = Color.RED
+            for (p in sn) {
+                paint.color = Color.RED
+                paint.style = Paint.Style.FILL
+                canvas.drawRect(p.getRect(squareSize), paint)
+                paint.color = Color.GRAY
+                paint.style = Paint.Style.STROKE
+                canvas.drawRect(p.getRect(squareSize), paint)
+            }
+        if(isOver()) {
+            paint.textSize = 100f
+            paint.color = Color.RED
+            paint.style = Paint.Style.FILL
+            canvas.drawText("GameOver", (width/2).toFloat(), (height/2).toFloat(), paint)
+            sn.clear()
+            gameOver=true
+            bait = Point(Random.nextInt(0,nbcol),Random.nextInt(0,nbrow))
+            head = Point(10,10)
+            sn.add(head)
         }
+
 
 
     }
@@ -90,11 +108,11 @@ class Snake(context : Context, attrs : AttributeSet) : View(context,attrs) {
                 }
                 Direction.bottom ->{
                     head.Y++
-                    if(head.X ==nbrow) head.X =0
+                    if(head.Y >=nbrow) head.Y =0
                 }
                 Direction.right -> {
                     head.X++
-                    if(head.X ==nbcol) head.X =0
+                    if(head.X >=nbcol) head.X =0
                 }
                 Direction.top -> {
                     head.Y--
@@ -131,5 +149,10 @@ class Snake(context : Context, attrs : AttributeSet) : View(context,attrs) {
 
     }
 
-
+fun isOver():Boolean{
+    for (p in sn){
+        if(p!=head && p.X ==head.X && p.Y==head.Y) return true
+    }
+    return false
+}
 }
